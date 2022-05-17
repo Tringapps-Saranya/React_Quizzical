@@ -1,25 +1,27 @@
 import { Button,Box,Chip,} from '@mui/material'
-import  Quiz_Result  from './Quiz_Result'
+import Quiz_Result from '../components/Quiz_Result';
 import axios from 'axios'
 import React, { useState,useEffect } from 'react'
 import '../assets/Quiz.css'
+import { decode } from 'html-entities';
 export default function Quiz(){
     const [data,setData] = useState([])
     const [checkAnswer,setCheckAnswer] = useState(false)
+    const {REACT_APP_DOMAIN_NAME} = process.env
     useEffect(()=>{ 
-        axios.get('https://opentdb.com/api.php?amount=5')
+        axios.get(`${REACT_APP_DOMAIN_NAME}/api.php?amount=5`)
         .then(response=>{
             let data = response.data.results;
             data.forEach(eachData=>{
-                eachData.options = []
+                eachData.allOptions = []
                 eachData.incorrect_answers.map(incorrectOption=>{
-                    let allOptions = {
+                    let wrong_options = {
                         option:incorrectOption,
                         isClicked:false,
                     }
-                    eachData.options.push(allOptions);
+                    eachData.allOptions.push(wrong_options);
                 })
-                eachData.options.push({
+                eachData.allOptions.push({
                     option:eachData.correct_answer,
                     isClicked:false,
                 });
@@ -29,30 +31,27 @@ export default function Quiz(){
     })
     },[])
 
-    function handleUserAnswer(options,clickedOption){
-        {
-            options.map((eachOption)=>{
+    function handleUserAnswer(allOptions,clickedOption){
+        allOptions.map((eachOption)=>{
                 return eachOption.isClicked = false;
             })
-        }
         clickedOption.isClicked = !clickedOption.isClicked;
         setData([...data]);
 
     }
-
     return(
         <div className='mainDiv'>
            { !checkAnswer && <Box sx = {{border:'1px solid black',width:'50%',padding:'10px'}}>
                 {data.map((questionOption) =>{
-                    const {question,options} = questionOption;
+                    const {question,allOptions} = questionOption;
                     return(
                         <div>
-                            <h3>{question}</h3>
+                            <h3>{decode(question)}</h3>
                             {
-                                options.map((eachOption)=>{
+                                allOptions.map((eachOption)=>{
                                             return(
                                                 <div>
-                                                    <Chip label={eachOption.option} variant="outlined" onClick = {()=>handleUserAnswer(options,eachOption)} color = {eachOption.isClicked ? 'success' : 'primary'}  />
+                                                    <Chip label={eachOption.option} variant="outlined" onClick = {()=>handleUserAnswer(allOptions,eachOption)} color = {eachOption.isClicked ? 'success' : 'primary'}  />
                                                 </div>
                                             )
                                         })
