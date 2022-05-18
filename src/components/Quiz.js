@@ -11,8 +11,8 @@ export default function Quiz(){
     useEffect(()=>{ 
         axios.get(`${REACT_APP_DOMAIN_NAME}/api.php?amount=5`)
         .then(response=>{
-            let data = response.data.results;
-            data.forEach(eachData=>{
+            let Apidata = response.data.results;
+            Apidata.forEach(eachData=>{
                 eachData.allOptions = []
                 eachData.incorrect_answers.map(incorrectOption=>{
                     let wrong_options = {
@@ -27,7 +27,7 @@ export default function Quiz(){
                 });
             })
       console.log(data);
-    setData(data);
+    setData(Apidata);
     })
     },[])
 
